@@ -33,7 +33,7 @@ mergedLabel <- rbind(trainLabel, testLabel)
 features <- read.table(paste(dataSetPath, "features.txt", sep='/'))
 meanAndStdFeatures <- grep("mean|std", features[, 2])
 mergedData <- mergedData[, meanAndStdFeatures]
-names(mergedData) <- tocamel(as.character(features[meanAndStdFeatures, 2]))
+names(mergedData) <- gsub("BodyBody", "Body", gsub("^t", "time", gsub("^f", "freq", tocamel(as.character(features[meanAndStdFeatures, 2])))))
 
 
 # 3. Uses descriptive activity names to name the activities in the data set
@@ -46,8 +46,8 @@ mergedLabel <- data.frame(activity=mergedLabel[, 2])
 # 4. Appropriately labels the data set with descriptive variable names.
 names(mergedSubject) <- 'subject'
 tidyDataSet <- cbind(mergedSubject, mergedLabel, mergedData)
-write.table(tidyDataSet, "merged_tidy_data_set.txt", row.name=FALSE)
 
 
 # 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-
+subjectActivityMeans <- aggregate(. ~ activity + subject,data = tidyDataSet,FUN=mean)
+write.table(tidyDataSet, "subject_activity_means.txt", row.name=FALSE)
